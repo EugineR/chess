@@ -1,16 +1,19 @@
 <div class="container">
-    <div class="board">
+    <div class="board" cdkDropListGroup>
         <div
             *ngFor="let figure of fen; let i = index"
-            [id]="'square-' + i"
+            [id]="i.toString()"
             [ngClass]="getSquareClass(i)"
+            cdkDropList
+            [cdkDropListData]="[figure]"
+            (cdkDropListDropped)="drop($event)"
         >
             <div
                 *ngIf="figure !== '0'"
                 cdkDragBoundary=".board"
                 cdkDrag
-                [innerHTML]="getInnerHtml(figure)"
                 class="figure"
+                [innerHTML]="getInnerHtml(figure)"
             ></div>
         </div>
     </div>
