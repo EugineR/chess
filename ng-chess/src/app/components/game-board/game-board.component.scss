@@ -1,5 +1,9 @@
 @import 'variables';
-
+.container {
+    display: flex;
+    justify-content: center;
+    user-select: none;
+}
 .board,
 .square {
     display: flex;
@@ -14,12 +18,18 @@
 .square {
     width: $square-size;
     height: $square-size;
+    font-size: $figure-size;
+    justify-content: center;
+    align-items: center;
+}
+.figure {
+    cursor: pointer;
 }
 
-.white-square {
+.white {
     background-color: $white-square-color;
 }
 
-.black-square {
+.black {
     background-color: $black-square-color;
 }

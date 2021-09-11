@@ -4,6 +4,9 @@ import {
     Component
 } from '@angular/core';
 
+import { DEFAULT_FEN_POSITIONS } from '../../constants/fen';
+import { FigureSymbolPipe } from '../../pipes/figure-symbol.pipe';
+
 @Component({
     selector: 'app-game-board',
     templateUrl: './game-board.component.html',
@@ -11,7 +14,7 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GameBoardComponent {
-    squares = new Array(64).fill(1);
+    fen = DEFAULT_FEN_POSITIONS.split('');
 
     constructor(private readonly _changeDetectorRef: ChangeDetectorRef) {}
 
@@ -21,9 +24,13 @@ export class GameBoardComponent {
 
     getSquareClass(i: number) {
         return {
-            [`${
-                GameBoardComponent._isBlackSquare(i) ? 'black' : 'white'
-            }-square`]: true
+            [`${GameBoardComponent._isBlackSquare(i) ? 'black' : 'white'}`]:
+                true,
+            square: true
         };
+    }
+
+    getInnerHtml(symbol: string) {
+        return new FigureSymbolPipe().transform(symbol);
     }
 }

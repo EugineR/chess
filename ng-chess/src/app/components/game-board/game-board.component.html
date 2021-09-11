@@ -1,9 +1,17 @@
-<div class="board">
-    <div
-        *ngFor="let square of squares; let i = index"
-        [ngClass]="getSquareClass(i)"
-        class="square"
-    >
-        {{ square }}
+<div class="container">
+    <div class="board">
+        <div
+            *ngFor="let figure of fen; let i = index"
+            [id]="'square-' + i"
+            [ngClass]="getSquareClass(i)"
+        >
+            <div
+                *ngIf="figure !== '0'"
+                cdkDragBoundary=".board"
+                cdkDrag
+                [innerHTML]="getInnerHtml(figure)"
+                class="figure"
+            ></div>
+        </div>
     </div>
 </div>
