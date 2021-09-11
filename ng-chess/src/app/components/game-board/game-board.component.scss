@@ -1,0 +1,25 @@
+@import 'variables';
+
+.board,
+.square {
+    display: flex;
+}
+
+.board {
+    width: $board-size;
+    height: $board-size;
+    flex-wrap: wrap;
+}
+
+.square {
+    width: $square-size;
+    height: $square-size;
+}
+
+.white-square {
+    background-color: $white-square-color;
+}
+
+.black-square {
+    background-color: $black-square-color;
+}

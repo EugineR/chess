@@ -1,0 +1,7 @@
+$board-size: 640px;
+$square-amount-in-a-row: 8;
+$square-size: $board-size / $square-amount-in-a-row;
+$figure-size: $square-size * 0.75;
+
+$black-square-color: rgb(96, 70, 59);
+$white-square-color: #99866e;

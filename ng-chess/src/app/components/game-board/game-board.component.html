@@ -1,1 +1,9 @@
-<p>game-board works!</p>
+<div class="board">
+    <div
+        *ngFor="let square of squares; let i = index"
+        [ngClass]="getSquareClass(i)"
+        class="square"
+    >
+        {{ square }}
+    </div>
+</div>
