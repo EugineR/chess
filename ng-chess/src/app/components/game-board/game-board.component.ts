@@ -8,6 +8,7 @@ import {
 import { DEFAULT_FEN_POSITIONS } from '@constants/fen';
 import { FigureSymbolPipe } from '@pipes/figure-symbol.pipe';
 import { UtilityService } from '@services/utility.service';
+import { MoveService } from '@services/move-service.service';
 
 @Component({
     selector: 'app-game-board',
@@ -20,7 +21,8 @@ export class GameBoardComponent {
 
     constructor(
         private readonly _changeDetectorRef: ChangeDetectorRef,
-        private readonly _utilityService: UtilityService
+        private readonly _utilityService: UtilityService,
+        private readonly _moveService: MoveService
     ) {}
 
     getSquareClass(index: number) {
@@ -36,7 +38,13 @@ export class GameBoardComponent {
     }
 
     drop(event: CdkDragDrop<string[]>) {
-        if (event.previousContainer !== event.container) {
+        const fromIndex = +event.previousContainer.id;
+        const toIndex = +event.container.id;
+
+        if (
+            event.previousContainer !== event.container &&
+            this._moveService.isMoveValid(this.fen, fromIndex, toIndex)
+        ) {
             transferArrayItem(
                 event.previousContainer.data,
                 event.container.data,
@@ -44,13 +52,11 @@ export class GameBoardComponent {
                 event.currentIndex
             );
 
-            const previousId = +event.previousContainer.id;
-            const currentId = +event.container.id;
-
-            [this.fen[previousId], this.fen[currentId]] = [
-                '0',
-                this.fen[previousId]
-            ];
+            this._doMove(fromIndex, toIndex);
         }
+    }
+
+    private _doMove(fromIndex: number, toIndex: number) {
+        [this.fen[fromIndex], this.fen[toIndex]] = ['0', this.fen[fromIndex]];
     }
 }

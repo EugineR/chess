@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { GameBoardComponent } from '@components/game-board/game-board.component';
 import { FigureSymbolPipe } from '@pipes/figure-symbol.pipe';
 import { UtilityService } from '@services/utility.service';
+import { MoveService } from '@services/move-service.service';
 
 @NgModule({
     declarations: [AppComponent, GameBoardComponent, FigureSymbolPipe],
@@ -17,7 +18,7 @@ import { UtilityService } from '@services/utility.service';
         BrowserAnimationsModule,
         DragDropModule
     ],
-    providers: [UtilityService],
+    providers: [UtilityService, MoveService],
     bootstrap: [AppComponent]
 })
 export class AppModule {}

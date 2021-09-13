@@ -23,6 +23,7 @@
             "@constants/*": ["src/app/constants/*"],
             "@pipes/*": ["src/app/pipes/*"],
             "@components/*": ["src/app/components/*"],
+            "@classes/*": ["src/app/classes/*"],
         }
     },
     "angularCompilerOptions": {
