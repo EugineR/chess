@@ -6,6 +6,13 @@ export class ChessMove {
         private readonly _to: Coordinates
     ) {}
 
+    get From() {
+        return this._from;
+    }
+    get To() {
+        return this._to;
+    }
+
     get DeltaX() {
         return this._to.x - this._from.x;
     }
@@ -22,11 +29,11 @@ export class ChessMove {
         return Math.abs(this.DeltaY);
     }
 
-    get absSignX() {
+    get SignX() {
         return Math.sign(this.DeltaX);
     }
 
-    get absSignY() {
+    get SignY() {
         return Math.sign(this.DeltaY);
     }
 }
