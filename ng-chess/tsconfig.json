@@ -5,6 +5,7 @@
         "baseUrl": "./",
         "outDir": "./dist/out-tsc",
         "forceConsistentCasingInFileNames": true,
+        "strictPropertyInitialization": false,
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
@@ -23,7 +24,7 @@
             "@constants/*": ["src/app/constants/*"],
             "@pipes/*": ["src/app/pipes/*"],
             "@components/*": ["src/app/components/*"],
-            "@classes/*": ["src/app/classes/*"],
+            "@classes/*": ["src/app/classes/*"]
         }
     },
     "angularCompilerOptions": {

@@ -19,6 +19,8 @@ import { MoveService } from '@services/move-service.service';
 export class GameBoardComponent {
     fen = DEFAULT_FEN_POSITIONS.split('');
 
+    private _selectedFigureIndex: number;
+
     constructor(
         private readonly _changeDetectorRef: ChangeDetectorRef,
         private readonly _utilityService: UtilityService,
@@ -29,9 +31,21 @@ export class GameBoardComponent {
         return {
             [this._utilityService.isBlackSquare(index) ? 'black' : 'white']:
                 true,
-            square: true
+            square: true,
+            'possible-move':
+                !!this._selectedFigureIndex &&
+                this._moveService.isMoveValid(
+                    this.fen,
+                    this._selectedFigureIndex,
+                    index
+                )
         };
     }
+    // Uncomment it for debugging purposes
+    // getCoords(index: number) {
+    //     const { x, y } = this._utilityService.getCoordinatesByIndex(index);
+    //     return `x:${x}:y:${y}`;
+    // }
 
     getInnerHtml(figureSymbol: string) {
         return new FigureSymbolPipe().transform(figureSymbol);
@@ -56,7 +70,21 @@ export class GameBoardComponent {
         }
     }
 
+    selectFigure(event: MouseEvent, figure: string, index: number): void {
+        const isPossibleMove = (event.target as Element).className.includes(
+            'possible-move'
+        );
+
+        if (isPossibleMove) {
+            this._doMove(this._selectedFigureIndex, index);
+            return;
+        }
+
+        this._selectedFigureIndex = figure !== '0' ? index : undefined!;
+    }
+
     private _doMove(fromIndex: number, toIndex: number) {
         [this.fen[fromIndex], this.fen[toIndex]] = ['0', this.fen[fromIndex]];
+        this._selectedFigureIndex = undefined!;
     }
 }

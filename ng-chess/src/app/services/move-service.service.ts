@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { FENKey } from '@constants/figure.enum';
 
+import { FENKey } from '@constants/figure.enum';
 import { UtilityService } from '@services/utility.service';
 import { ChessMove } from '@classes/move.class';
 
@@ -17,25 +17,34 @@ export class MoveService {
         const targetSquare = fen[toIndex] as FENKey;
 
         const fromCoordinates =
-            this._utilityService.getFigureCoordinatesByIndex(fromIndex);
+            this._utilityService.getCoordinatesByIndex(fromIndex);
         const toCoordinates =
-            this._utilityService.getFigureCoordinatesByIndex(toIndex);
+            this._utilityService.getCoordinatesByIndex(toIndex);
 
         console.log(
             `From: ${fromCoordinates.x}:${fromCoordinates.y}; To ${toCoordinates.x}:${toCoordinates.y} `
         );
 
-        const move = new ChessMove(fromCoordinates, toCoordinates);
+        const move = new ChessMove(
+            fromCoordinates,
+            toCoordinates,
+            fromIndex,
+            toIndex
+        );
 
         // TODO: implement checks: is my/opponents King under attack before/after move,
         //  is there at least one possible move.
         return (
             this._isTargetSquareValid(figure, targetSquare) &&
-            this._isFigureCanMove(figure, move)
+            this._isFigureCanMove(fen, figure, move)
         );
     }
 
-    private _isFigureCanMove(figure: string, move: ChessMove): boolean {
+    private _isFigureCanMove(
+        fen: string[],
+        figure: string,
+        move: ChessMove
+    ): boolean {
         switch (figure) {
             case FENKey.WhiteKing:
             case FENKey.BlackKing:
@@ -43,11 +52,11 @@ export class MoveService {
 
             case FENKey.WhiteQueen:
             case FENKey.BlackQueen:
-                return this._isQueenCanMove(move);
+                return this._isQueenCanMove(fen, move);
 
             case FENKey.BlackBishop:
             case FENKey.WhiteBishop:
-                return this._isBishopCanMove(move);
+                return this._isBishopCanMove(fen, move);
 
             case FENKey.BlackKnight:
             case FENKey.WhiteKnight:
@@ -55,7 +64,7 @@ export class MoveService {
 
             case FENKey.WhiteRook:
             case FENKey.BlackRook:
-                return this._isRookCanMove(move);
+                return this._isRookCanMove(fen, move);
 
             case FENKey.WhitePawn:
             case FENKey.BlackPawn:
@@ -90,19 +99,23 @@ export class MoveService {
         );
     }
 
-    private _isBishopCanMove(move: ChessMove) {
-        return move.AbsDeltaX === move.AbsDeltaY;
-    }
-
-    private _isRookCanMove(move: ChessMove) {
+    private _isBishopCanMove(fen: string[], move: ChessMove) {
         return (
-            (!move.AbsDeltaX && !!move.AbsDeltaY) ||
-            (!!move.AbsDeltaX && !move.AbsDeltaY)
+            this._canMoveStraight(fen, move) &&
+            move.SignY !== 0 &&
+            move.SignX !== 0
         );
     }
 
-    private _isQueenCanMove(move: ChessMove) {
-        return this._isBishopCanMove(move) || this._isRookCanMove(move);
+    private _isRookCanMove(fen: string[], move: ChessMove) {
+        return (
+            this._canMoveStraight(fen, move) &&
+            (move.SignY === 0 || move.SignX === 0)
+        );
+    }
+
+    private _isQueenCanMove(fen: string[], move: ChessMove) {
+        return this._canMoveStraight(fen, move);
     }
 
     private _isPawnCanMove(move: ChessMove) {
@@ -112,5 +125,29 @@ export class MoveService {
             move.AbsDeltaY <= (isTwoSquareMovePossible ? 2 : 1) &&
             move.DeltaX === 0
         );
+    }
+
+    private _canMoveStraight(fen: string[], move: ChessMove) {
+        let tempCoordinates = { ...move.From };
+
+        do {
+            debugger;
+            tempCoordinates = {
+                x: tempCoordinates.x + move.SignX,
+                y: tempCoordinates.y + move.SignY
+            };
+            if (
+                tempCoordinates.x === move.To.x &&
+                tempCoordinates.y === move.To.y
+            ) {
+                return true;
+            }
+        } while (
+            this._utilityService.isCoordinatesOnBoard(tempCoordinates) &&
+            fen[this._utilityService.getIndexByCoordinates(tempCoordinates)] ===
+                FENKey.Empty
+        );
+
+        return false;
     }
 }

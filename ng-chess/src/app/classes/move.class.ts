@@ -3,14 +3,25 @@ import { Coordinates } from '@interfaces/gameboard/coordinates.interface';
 export class ChessMove {
     constructor(
         private readonly _from: Coordinates,
-        private readonly _to: Coordinates
+        private readonly _to: Coordinates,
+        private readonly _fromIndex: number,
+        private readonly _toIndex: number
     ) {}
 
     get From() {
         return this._from;
     }
+
     get To() {
         return this._to;
+    }
+
+    get FromIndex() {
+        return this._fromIndex;
+    }
+
+    get ToIndex() {
+        return this._toIndex;
     }
 
     get DeltaX() {

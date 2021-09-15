@@ -16,6 +16,7 @@
 }
 
 .square {
+    position: relative;
     width: $square-size;
     height: $square-size;
     font-size: $figure-size;
@@ -32,4 +33,17 @@
 
 .black {
     background-color: $black-square-color;
+}
+.possible-move {
+    cursor: pointer;
+
+    &::after {
+        content: '';
+        display: flex;
+        position: absolute;
+        width: $advice-circle-size;
+        height: $advice-circle-size;
+        border-radius: 50%;
+        background-color: rgba(37, 108, 9, 0.5);
+    }
 }
