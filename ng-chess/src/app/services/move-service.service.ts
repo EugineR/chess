@@ -131,7 +131,6 @@ export class MoveService {
         let tempCoordinates = { ...move.From };
 
         do {
-            debugger;
             tempCoordinates = {
                 x: tempCoordinates.x + move.SignX,
                 y: tempCoordinates.y + move.SignY

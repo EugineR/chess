@@ -9,6 +9,7 @@ import { DEFAULT_FEN_POSITIONS } from '@constants/fen';
 import { FigureSymbolPipe } from '@pipes/figure-symbol.pipe';
 import { UtilityService } from '@services/utility.service';
 import { MoveService } from '@services/move-service.service';
+import { GameSessionService } from '@services/game-session.service';
 
 @Component({
     selector: 'app-game-board',
@@ -17,14 +18,22 @@ import { MoveService } from '@services/move-service.service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GameBoardComponent {
-    fen = DEFAULT_FEN_POSITIONS.split('');
+    get squares(): string[] {
+        return this._fen.split('');
+    }
 
+    get isRevertDisabled(): boolean {
+        return this._gameSessionService.isFenStorageEmpty();
+    }
+
+    private _fen: string = DEFAULT_FEN_POSITIONS;
     private _selectedFigureIndex: number;
 
     constructor(
         private readonly _changeDetectorRef: ChangeDetectorRef,
         private readonly _utilityService: UtilityService,
-        private readonly _moveService: MoveService
+        private readonly _moveService: MoveService,
+        private readonly _gameSessionService: GameSessionService
     ) {}
 
     getSquareClass(index: number) {
@@ -35,7 +44,7 @@ export class GameBoardComponent {
             'possible-move':
                 !!this._selectedFigureIndex &&
                 this._moveService.isMoveValid(
-                    this.fen,
+                    this.squares,
                     this._selectedFigureIndex,
                     index
                 )
@@ -57,7 +66,7 @@ export class GameBoardComponent {
 
         if (
             event.previousContainer !== event.container &&
-            this._moveService.isMoveValid(this.fen, fromIndex, toIndex)
+            this._moveService.isMoveValid(this.squares, fromIndex, toIndex)
         ) {
             transferArrayItem(
                 event.previousContainer.data,
@@ -83,8 +92,23 @@ export class GameBoardComponent {
         this._selectedFigureIndex = figure !== '0' ? index : undefined!;
     }
 
+    doRevertMove() {
+        this._fen = this._gameSessionService.getPreviousFen();
+        this._changeDetectorRef.detectChanges();
+    }
+
     private _doMove(fromIndex: number, toIndex: number) {
-        [this.fen[fromIndex], this.fen[toIndex]] = ['0', this.fen[fromIndex]];
+        this._gameSessionService.saveFen(this._fen);
+        this._swapFigures(fromIndex, toIndex);
         this._selectedFigureIndex = undefined!;
+    }
+
+    private _swapFigures(fromIndex: number, toIndex: number): void {
+        let newSquares = [...this.squares];
+        [newSquares[fromIndex], newSquares[toIndex]] = [
+            '0',
+            newSquares[fromIndex]
+        ];
+        this._fen = newSquares.join('');
     }
 }

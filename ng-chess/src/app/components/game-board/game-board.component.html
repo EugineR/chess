@@ -1,7 +1,7 @@
 <div class="container">
     <div class="board" cdkDropListGroup>
         <div
-            *ngFor="let figure of fen; let i = index"
+            *ngFor="let figure of squares; let i = index"
             [id]="i.toString()"
             [ngClass]="getSquareClass(i)"
             cdkDropList
@@ -10,10 +10,10 @@
             (click)="selectFigure($event, figure, i)"
             (mousedown)="selectFigure($event, figure, i)"
         >
-<!--            Uncomment it for debugging purposes-->
-<!--            <div style="position: absolute; font-size: 10px; top: 0; left: 0">-->
-<!--                {{getCoords(i)}}-->
-<!--            </div>-->
+            <!--            Uncomment it for debugging purposes-->
+            <!--            <div style="position: absolute; font-size: 10px; top: 0; left: 0">-->
+            <!--                {{getCoords(i)}}-->
+            <!--            </div>-->
             <div
                 *ngIf="figure !== '0'"
                 cdkDragBoundary=".board"
@@ -23,4 +23,8 @@
             ></div>
         </div>
     </div>
+</div>
+
+<div class="menu">
+    <button (click)="doRevertMove()" [disabled]="isRevertDisabled">Revert move</button>
 </div>
