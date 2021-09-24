@@ -10,6 +10,7 @@ import { FigureSymbolPipe } from '@pipes/figure-symbol.pipe';
 import { UtilityService } from '@services/utility.service';
 import { MoveService } from '@services/move-service.service';
 import { GameSessionService } from '@services/game-session.service';
+import { FENKey } from '@constants/figure.enum';
 
 @Component({
     selector: 'app-game-board',
@@ -53,13 +54,11 @@ export class GameBoardComponent {
                 true,
             square: true,
             flipped: this._isFlipBoard,
-            'possible-move':
-                !!this._selectedFigureIndex &&
-                this._moveService.isMoveValid(
-                    this.squares,
-                    this._selectedFigureIndex,
-                    index
-                )
+            'possible-move': this._isPossibleMove(index),
+            'possible-attack':
+                this._isPossibleMove(index) &&
+                this._fen[index] !== FENKey.Empty,
+            'selected-figure': this._selectedFigureIndex === index
         };
     }
 
@@ -120,5 +119,16 @@ export class GameBoardComponent {
         this._fen = this._moveService
             .getSquaresAfterSwap(this.squares, fromIndex, toIndex)
             .join('');
+    }
+
+    private _isPossibleMove(index: number) {
+        return (
+            !!this._selectedFigureIndex &&
+            this._moveService.isMoveValid(
+                this.squares,
+                this._selectedFigureIndex,
+                index
+            )
+        );
     }
 }

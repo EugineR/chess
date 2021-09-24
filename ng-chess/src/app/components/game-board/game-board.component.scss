@@ -1,9 +1,15 @@
 @import 'variables';
+
 .container {
     display: flex;
     justify-content: center;
     user-select: none;
+
+    * {
+        box-sizing: border-box;
+    }
 }
+
 .board,
 .square {
     display: flex;
@@ -13,10 +19,15 @@
     width: $board-size;
     height: $board-size;
     flex-wrap: wrap;
+    background-color: white;
 }
 
 .flipped {
     transform: rotate(180deg);
+}
+
+.selected-figure {
+    background-color: rgb(100, 125, 40) !important;
 }
 
 .square {
@@ -41,6 +52,18 @@
 .possible-move {
     cursor: pointer;
 
+    &:hover {
+        background-color: $suggestions-color;
+    }
+
+    &.possible-attack {
+        border: 3px dashed $suggestions-color;
+
+        &::after {
+            content: none;
+        }
+    }
+
     &::after {
         content: '';
         display: flex;
@@ -48,6 +71,6 @@
         width: $advice-circle-size;
         height: $advice-circle-size;
         border-radius: 50%;
-        background-color: rgba(37, 108, 9, 0.5);
+        background-color: $suggestions-color;
     }
 }

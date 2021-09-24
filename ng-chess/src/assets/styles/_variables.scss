@@ -2,7 +2,8 @@ $board-size: 640px;
 $square-amount-in-a-row: 8;
 $square-size: $board-size / $square-amount-in-a-row;
 $figure-size: $square-size * 0.75;
-$advice-circle-size: $square-size * 0.4;
+$advice-circle-size: $square-size * 0.3;
 
 $black-square-color: rgb(173, 92, 58);
 $white-square-color: #ffdd9b;
+$suggestions-color: rgb(145, 163, 82);
