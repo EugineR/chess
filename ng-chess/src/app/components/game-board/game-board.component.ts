@@ -104,11 +104,8 @@ export class GameBoardComponent {
     }
 
     private _swapFigures(fromIndex: number, toIndex: number): void {
-        let newSquares = [...this.squares];
-        [newSquares[fromIndex], newSquares[toIndex]] = [
-            '0',
-            newSquares[fromIndex]
-        ];
-        this._fen = newSquares.join('');
+        this._fen = this._moveService
+            .getSquaresAfterSwap(this.squares, fromIndex, toIndex)
+            .join('');
     }
 }

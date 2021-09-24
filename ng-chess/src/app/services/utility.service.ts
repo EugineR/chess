@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Coordinates } from '@interfaces/gameboard/coordinates.interface';
 import { FENKey } from '@constants/figure.enum';
+import { FigureColor } from '@constants/figure-color.enum';
 
 @Injectable()
 export class UtilityService {
@@ -28,5 +29,11 @@ export class UtilityService {
 
     isWhiteFigure(fenCode: FENKey): boolean {
         return fenCode == fenCode.toUpperCase();
+    }
+
+    getColorOfTheFigure(figure: FENKey): FigureColor {
+        return this.isWhiteFigure(figure)
+            ? FigureColor.White
+            : FigureColor.Black;
     }
 }

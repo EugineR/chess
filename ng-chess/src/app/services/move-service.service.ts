@@ -3,60 +3,101 @@ import { Injectable } from '@angular/core';
 import { FENKey } from '@constants/figure.enum';
 import { UtilityService } from '@services/utility.service';
 import { ChessMove } from '@classes/move.class';
+import { FigureColor } from '@constants/figure-color.enum';
 
 @Injectable()
 export class MoveService {
     constructor(private readonly _utilityService: UtilityService) {}
 
-    isMoveValid(fen: string[], fromIndex: number, toIndex: number): boolean {
+    isMoveValid(
+        squares: string[],
+        fromIndex: number,
+        toIndex: number
+    ): boolean {
         if (fromIndex === toIndex) {
             return false;
         }
 
-        const figure = fen[fromIndex] as FENKey;
-        const targetSquare = fen[toIndex] as FENKey;
-
-        const fromCoordinates =
-            this._utilityService.getCoordinatesByIndex(fromIndex);
-        const toCoordinates =
-            this._utilityService.getCoordinatesByIndex(toIndex);
+        const move = this.getMoveByIndexes(fromIndex, toIndex);
 
         console.log(
-            `From: ${fromCoordinates.x}:${fromCoordinates.y}; To ${toCoordinates.x}:${toCoordinates.y} `
-        );
-
-        const move = new ChessMove(
-            fromCoordinates,
-            toCoordinates,
-            fromIndex,
-            toIndex
+            `From: ${move.From.x}:${move.From.y}; To ${move.To.x}:${move.To.y} `
         );
 
         // TODO: implement checks: is my/opponents King under attack before/after move,
         //  is there at least one possible move.
         return (
-            this._isTargetSquareValid(figure, targetSquare) &&
-            this._isFigureCanMove(fen, figure, move)
+            this._isFigureCanMoveWrapper(squares, move) &&
+            !this._isCheck(squares, move)
         );
     }
 
-    private _isFigureCanMove(
-        fen: string[],
-        figure: string,
-        move: ChessMove
-    ): boolean {
-        switch (figure) {
+    private _isCheck(squares: string[], mainMove: ChessMove): boolean {
+        const color = this._utilityService.getColorOfTheFigure(
+            squares[mainMove.FromIndex] as FENKey
+        );
+
+        const squaresAfterMove = this.getSquaresAfterSwap(
+            squares,
+            mainMove.FromIndex,
+            mainMove.ToIndex
+        );
+
+        const enemyFigures: { key: FENKey; index: number }[] = [];
+
+        const myKingIndex = squaresAfterMove.findIndex(
+            (key) =>
+                key ===
+                (color === FigureColor.White
+                    ? FENKey.WhiteKing
+                    : FENKey.BlackKing)
+        );
+
+        // Fulfilling array of enemies.
+        squaresAfterMove.forEach((key, index) => {
+            if (
+                this._utilityService.getColorOfTheFigure(key as FENKey) !==
+                    color &&
+                key !== FENKey.Empty
+            ) {
+                enemyFigures.push({ key: key as FENKey, index });
+            }
+        });
+
+        const isSomeFigureChecksAfterMove = enemyFigures.some(
+            ({ key, index }) => {
+                const moveToMyKing = this.getMoveByIndexes(index, myKingIndex);
+
+                return this._isFigureCanMoveWrapper(
+                    squaresAfterMove,
+                    moveToMyKing
+                );
+            }
+        );
+
+        return isSomeFigureChecksAfterMove;
+    }
+
+    private _isFigureCanMoveWrapper(squares: string[], move: ChessMove) {
+        return (
+            this._isTargetSquareValid(squares, move) &&
+            this._isFigureCanMove(squares, move)
+        );
+    }
+
+    private _isFigureCanMove(squares: string[], move: ChessMove): boolean {
+        switch (squares[move.FromIndex]) {
             case FENKey.WhiteKing:
             case FENKey.BlackKing:
                 return this._isKingCanMove(move);
 
             case FENKey.WhiteQueen:
             case FENKey.BlackQueen:
-                return this._isQueenCanMove(fen, move);
+                return this._isQueenCanMove(squares, move);
 
             case FENKey.BlackBishop:
             case FENKey.WhiteBishop:
-                return this._isBishopCanMove(fen, move);
+                return this._isBishopCanMove(squares, move);
 
             case FENKey.BlackKnight:
             case FENKey.WhiteKnight:
@@ -64,17 +105,19 @@ export class MoveService {
 
             case FENKey.WhiteRook:
             case FENKey.BlackRook:
-                return this._isRookCanMove(fen, move);
+                return this._isRookCanMove(squares, move);
 
             case FENKey.WhitePawn:
             case FENKey.BlackPawn:
-                return this._isPawnCanMove(fen, move);
+                return this._isPawnCanMove(squares, move);
         }
 
         return true;
     }
 
-    private _isTargetSquareValid(figure: FENKey, targetSquare: FENKey) {
+    private _isTargetSquareValid(squares: string[], move: ChessMove) {
+        const figure = squares[move.FromIndex] as FENKey;
+        const targetSquare = squares[move.ToIndex] as FENKey;
         let isTargetSquareValid = true;
 
         if (targetSquare !== FENKey.Empty) {
@@ -99,28 +142,28 @@ export class MoveService {
         );
     }
 
-    private _isBishopCanMove(fen: string[], move: ChessMove) {
+    private _isBishopCanMove(squares: string[], move: ChessMove) {
         return (
-            this._canMoveStraight(fen, move) &&
+            this._canFigureMoveStraight(squares, move) &&
             move.SignY !== 0 &&
             move.SignX !== 0
         );
     }
 
-    private _isRookCanMove(fen: string[], move: ChessMove) {
+    private _isRookCanMove(squares: string[], move: ChessMove) {
         return (
-            this._canMoveStraight(fen, move) &&
+            this._canFigureMoveStraight(squares, move) &&
             (move.SignY === 0 || move.SignX === 0)
         );
     }
 
-    private _isQueenCanMove(fen: string[], move: ChessMove) {
-        return this._canMoveStraight(fen, move);
+    private _isQueenCanMove(squares: string[], move: ChessMove) {
+        return this._canFigureMoveStraight(squares, move);
     }
 
-    private _isPawnCanMove(fen: string[], move: ChessMove) {
+    private _isPawnCanMove(squares: string[], move: ChessMove) {
         const isWhiteFigureMoving = this._utilityService.isWhiteFigure(
-            fen[move.FromIndex] as FENKey
+            squares[move.FromIndex] as FENKey
         );
 
         const isSignValid = isWhiteFigureMoving
@@ -129,12 +172,12 @@ export class MoveService {
 
         return (
             isSignValid &&
-            (this._isPawnAbleToMoveForward(fen, move) ||
-                this._isPawnAbleToAttack(fen, move))
+            (this._isPawnAbleToMoveForward(squares, move) ||
+                this._isPawnAbleToAttack(squares, move))
         );
     }
 
-    private _canMoveStraight(fen: string[], move: ChessMove) {
+    private _canFigureMoveStraight(squares: string[], move: ChessMove) {
         let tempCoordinates = { ...move.From };
 
         do {
@@ -150,36 +193,65 @@ export class MoveService {
             }
         } while (
             this._utilityService.isCoordinatesOnBoard(tempCoordinates) &&
-            fen[this._utilityService.getIndexByCoordinates(tempCoordinates)] ===
-                FENKey.Empty
+            squares[
+                this._utilityService.getIndexByCoordinates(tempCoordinates)
+            ] === FENKey.Empty
         );
 
         return false;
     }
 
-    private _isPawnAbleToMoveForward(fen: string[], move: ChessMove) {
+    private _isPawnAbleToMoveForward(squares: string[], move: ChessMove) {
         const isTwoSquareMovePossible = [1, 6].includes(move.From.y);
 
         return (
             move.AbsDeltaY <= (isTwoSquareMovePossible ? 2 : 1) &&
             move.DeltaX === 0 &&
-            fen[move.ToIndex] === FENKey.Empty
+            squares[move.ToIndex] === FENKey.Empty
         );
     }
 
-    private _isPawnAbleToAttack(fen: string[], move: ChessMove) {
+    private _isPawnAbleToAttack(squares: string[], move: ChessMove) {
         const isWhiteFigureMoving = this._utilityService.isWhiteFigure(
-            fen[move.FromIndex] as FENKey
+            squares[move.FromIndex] as FENKey
         );
         const isWhiteTargetFigure = this._utilityService.isWhiteFigure(
-            fen[move.ToIndex] as FENKey
+            squares[move.ToIndex] as FENKey
         );
 
         return (
             move.AbsDeltaX === 1 &&
             move.AbsDeltaY === 1 &&
             isWhiteTargetFigure !== isWhiteFigureMoving &&
-            fen[move.ToIndex] !== FENKey.Empty
+            squares[move.ToIndex] !== FENKey.Empty
         );
+    }
+
+    getMoveByIndexes(fromIndex: number, toIndex: number) {
+        const fromCoordinates =
+            this._utilityService.getCoordinatesByIndex(fromIndex);
+        const toCoordinates =
+            this._utilityService.getCoordinatesByIndex(toIndex);
+
+        return new ChessMove(
+            fromCoordinates,
+            toCoordinates,
+            fromIndex,
+            toIndex
+        );
+    }
+
+    getSquaresAfterSwap(
+        squares: string[],
+        fromIndex: number,
+        toIndex: number
+    ): string[] {
+        let newSquares = [...squares];
+        [newSquares[fromIndex], newSquares[toIndex]] = [
+            '0',
+            newSquares[fromIndex]
+        ];
+
+        return newSquares;
     }
 }
