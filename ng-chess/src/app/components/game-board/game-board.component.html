@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="board" cdkDropListGroup>
+    <div class="board"  [ngClass]="getBoardClass" cdkDropListGroup>
         <div
             *ngFor="let figure of squares; let i = index"
             [id]="i.toString()"
@@ -27,4 +27,5 @@
 
 <div class="menu">
     <button (click)="doRevertMove()" [disabled]="isRevertDisabled">Revert move</button>
+    <button (click)="flipBoard()" >Flip board</button>
 </div>

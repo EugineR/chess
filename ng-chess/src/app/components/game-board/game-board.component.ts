@@ -26,8 +26,15 @@ export class GameBoardComponent {
         return this._gameSessionService.isFenStorageEmpty();
     }
 
+    get getBoardClass() {
+        return {
+            flipped: this._isFlipBoard
+        };
+    }
+
     private _fen: string = DEFAULT_FEN_POSITIONS;
     private _selectedFigureIndex: number;
+    private _isFlipBoard = false;
 
     constructor(
         private readonly _changeDetectorRef: ChangeDetectorRef,
@@ -36,11 +43,16 @@ export class GameBoardComponent {
         private readonly _gameSessionService: GameSessionService
     ) {}
 
+    flipBoard() {
+        this._isFlipBoard = !this._isFlipBoard;
+    }
+
     getSquareClass(index: number) {
         return {
             [this._utilityService.isBlackSquare(index) ? 'black' : 'white']:
                 true,
             square: true,
+            flipped: this._isFlipBoard,
             'possible-move':
                 !!this._selectedFigureIndex &&
                 this._moveService.isMoveValid(
@@ -50,6 +62,7 @@ export class GameBoardComponent {
                 )
         };
     }
+
     // Uncomment it for debugging purposes
     // getCoords(index: number) {
     //     const { x, y } = this._utilityService.getCoordinatesByIndex(index);

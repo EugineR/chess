@@ -15,6 +15,10 @@
     flex-wrap: wrap;
 }
 
+.flipped {
+    transform: rotate(180deg);
+}
+
 .square {
     position: relative;
     width: $square-size;
