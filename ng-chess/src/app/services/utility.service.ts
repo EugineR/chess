@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Coordinates } from '@interfaces/gameboard/coordinates.interface';
+import { FENKey } from '@constants/figure.enum';
 
 @Injectable()
 export class UtilityService {
@@ -23,5 +24,9 @@ export class UtilityService {
 
     isCoordinatesOnBoard({ x, y }: Coordinates) {
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
+    }
+
+    isWhiteFigure(fenCode: FENKey): boolean {
+        return fenCode == fenCode.toUpperCase();
     }
 }

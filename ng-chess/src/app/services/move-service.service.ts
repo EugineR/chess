@@ -68,7 +68,7 @@ export class MoveService {
 
             case FENKey.WhitePawn:
             case FENKey.BlackPawn:
-                return this._isPawnCanMove(move);
+                return this._isPawnCanMove(fen, move);
         }
 
         return true;
@@ -78,9 +78,9 @@ export class MoveService {
         let isTargetSquareValid = true;
 
         if (targetSquare !== FENKey.Empty) {
-            const isFigureWhite = figure == figure.toUpperCase();
+            const isFigureWhite = this._utilityService.isWhiteFigure(figure);
             const isTargetFigureWhite =
-                targetSquare == targetSquare.toUpperCase();
+                this._utilityService.isWhiteFigure(targetSquare);
 
             isTargetSquareValid = isFigureWhite !== isTargetFigureWhite;
         }
@@ -118,12 +118,19 @@ export class MoveService {
         return this._canMoveStraight(fen, move);
     }
 
-    private _isPawnCanMove(move: ChessMove) {
-        const isTwoSquareMovePossible = [1, 6].includes(move.From.y);
+    private _isPawnCanMove(fen: string[], move: ChessMove) {
+        const isWhiteFigureMoving = this._utilityService.isWhiteFigure(
+            fen[move.FromIndex] as FENKey
+        );
+
+        const isSignValid = isWhiteFigureMoving
+            ? move.DeltaY < 0
+            : move.DeltaY > 0;
 
         return (
-            move.AbsDeltaY <= (isTwoSquareMovePossible ? 2 : 1) &&
-            move.DeltaX === 0
+            isSignValid &&
+            (this._isPawnAbleToMoveForward(fen, move) ||
+                this._isPawnAbleToAttack(fen, move))
         );
     }
 
@@ -148,5 +155,31 @@ export class MoveService {
         );
 
         return false;
+    }
+
+    private _isPawnAbleToMoveForward(fen: string[], move: ChessMove) {
+        const isTwoSquareMovePossible = [1, 6].includes(move.From.y);
+
+        return (
+            move.AbsDeltaY <= (isTwoSquareMovePossible ? 2 : 1) &&
+            move.DeltaX === 0 &&
+            fen[move.ToIndex] === FENKey.Empty
+        );
+    }
+
+    private _isPawnAbleToAttack(fen: string[], move: ChessMove) {
+        const isWhiteFigureMoving = this._utilityService.isWhiteFigure(
+            fen[move.FromIndex] as FENKey
+        );
+        const isWhiteTargetFigure = this._utilityService.isWhiteFigure(
+            fen[move.ToIndex] as FENKey
+        );
+
+        return (
+            move.AbsDeltaX === 1 &&
+            move.AbsDeltaY === 1 &&
+            isWhiteTargetFigure !== isWhiteFigureMoving &&
+            fen[move.ToIndex] !== FENKey.Empty
+        );
     }
 }
