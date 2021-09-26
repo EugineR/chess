@@ -92,9 +92,11 @@ export class GameBoardComponent {
     }
 
     selectFigure(event: MouseEvent, figure: string, index: number): void {
-        const isPossibleMove = (event.target as Element).className.includes(
-            'possible-move'
-        );
+        const elementClassnames = (event.currentTarget as Element).className;
+
+        const isPossibleMove =
+            elementClassnames.includes('possible-move') ||
+            elementClassnames.includes('possible-attack');
 
         if (isPossibleMove) {
             this._doMove(this._selectedFigureIndex, index);
