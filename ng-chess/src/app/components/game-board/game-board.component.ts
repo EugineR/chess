@@ -33,6 +33,10 @@ export class GameBoardComponent {
         };
     }
 
+    get getTurnText() {
+        return this._gameSessionService.IsWhiteTurn ? 'White' : 'Black';
+    }
+
     private _fen: string = DEFAULT_FEN_POSITIONS;
     private _selectedFigureIndex: number;
     private _isFlipBoard = false;
@@ -96,10 +100,6 @@ export class GameBoardComponent {
     }
 
     selectFigure(event: MouseEvent, figure: string, index: number): void {
-        if (!this._isThisColorCanMove(this._fen[index] as FENKey)) {
-            return;
-        }
-
         const elementClassnames = (event.currentTarget as Element).className;
 
         const isPossibleMove =
@@ -108,6 +108,10 @@ export class GameBoardComponent {
 
         if (isPossibleMove) {
             this._doMove(this._selectedFigureIndex, index);
+            return;
+        }
+
+        if (!this._isThisColorCanMove(this._fen[index] as FENKey)) {
             return;
         }
 

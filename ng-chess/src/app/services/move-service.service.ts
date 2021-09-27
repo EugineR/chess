@@ -20,10 +20,6 @@ export class MoveService {
 
         const move = this.getMoveByIndexes(fromIndex, toIndex);
 
-        console.log(
-            `From: ${move.From.x}:${move.From.y}; To ${move.To.x}:${move.To.y} `
-        );
-
         // TODO: implement checks: is my/opponents King under attack before/after move,
         //  is there at least one possible move.
         return (
@@ -202,11 +198,15 @@ export class MoveService {
     }
 
     private _isPawnAbleToMoveForward(squares: string[], move: ChessMove) {
-        // TODO: prevent just across enemy's pawn.
-        const isTwoSquareMovePossible = [1, 6].includes(move.From.y);
+        const isJumpPosition = [1, 6].includes(move.From.y);
+
+        const isJumpPossible =
+            isJumpPosition &&
+            squares[move.FromIndex + move.SignY * 8] === FENKey.Empty &&
+            squares[move.ToIndex] === FENKey.Empty;
 
         return (
-            move.AbsDeltaY <= (isTwoSquareMovePossible ? 2 : 1) &&
+            move.AbsDeltaY <= (isJumpPossible ? 2 : 1) &&
             move.DeltaX === 0 &&
             squares[move.ToIndex] === FENKey.Empty
         );

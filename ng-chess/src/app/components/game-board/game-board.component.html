@@ -27,6 +27,10 @@
 </div>
 
 <div class="menu">
+    <div class="details">
+<!--        <div class="moves">Moves:</div>-->
+        <div class="turn">Turn: {{ getTurnText }}</div>
+    </div>
     <button (click)="doRevertMove()" [disabled]="isRevertDisabled">Revert move</button>
     <button (click)="flipBoard()" >Flip board</button>
 </div>
