@@ -8,43 +8,43 @@ export class ChessMove {
         private readonly _toIndex: number
     ) {}
 
-    get From() {
+    get from() {
         return this._from;
     }
 
-    get To() {
+    get to() {
         return this._to;
     }
 
-    get FromIndex() {
+    get fromIndex() {
         return this._fromIndex;
     }
 
-    get ToIndex() {
+    get toIndex() {
         return this._toIndex;
     }
 
-    get DeltaX() {
+    get deltaX() {
         return this._to.x - this._from.x;
     }
 
-    get DeltaY() {
+    get deltaY() {
         return this._to.y - this._from.y;
     }
 
-    get AbsDeltaX() {
-        return Math.abs(this.DeltaX);
+    get absDeltaX() {
+        return Math.abs(this.deltaX);
     }
 
-    get AbsDeltaY() {
-        return Math.abs(this.DeltaY);
+    get absDeltaY() {
+        return Math.abs(this.deltaY);
     }
 
-    get SignX() {
-        return Math.sign(this.DeltaX);
+    get signX() {
+        return Math.sign(this.deltaX);
     }
 
-    get SignY() {
-        return Math.sign(this.DeltaY);
+    get signY() {
+        return Math.sign(this.deltaY);
     }
 }

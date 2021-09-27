@@ -119,6 +119,7 @@ export class GameBoardComponent {
     }
 
     doRevertMove() {
+        this._selectedFigureIndex = undefined!;
         this._fen = this._gameSessionService.getPreviousFen();
         this._changeDetectorRef.detectChanges();
     }
