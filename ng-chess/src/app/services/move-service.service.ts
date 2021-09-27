@@ -202,6 +202,7 @@ export class MoveService {
     }
 
     private _isPawnAbleToMoveForward(squares: string[], move: ChessMove) {
+        // TODO: prevent just across enemy's pawn.
         const isTwoSquareMovePossible = [1, 6].includes(move.From.y);
 
         return (

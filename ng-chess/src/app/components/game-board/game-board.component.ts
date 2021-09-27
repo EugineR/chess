@@ -62,6 +62,10 @@ export class GameBoardComponent {
         };
     }
 
+    getDraggableDisableState(index: number) {
+        return !this._isThisColorCanMove(this._fen[index] as FENKey);
+    }
+
     // Uncomment it for debugging purposes
     // getCoords(index: number) {
     //     const { x, y } = this._utilityService.getCoordinatesByIndex(index);
@@ -92,6 +96,10 @@ export class GameBoardComponent {
     }
 
     selectFigure(event: MouseEvent, figure: string, index: number): void {
+        if (!this._isThisColorCanMove(this._fen[index] as FENKey)) {
+            return;
+        }
+
         const elementClassnames = (event.currentTarget as Element).className;
 
         const isPossibleMove =
@@ -109,6 +117,13 @@ export class GameBoardComponent {
     doRevertMove() {
         this._fen = this._gameSessionService.getPreviousFen();
         this._changeDetectorRef.detectChanges();
+    }
+
+    private _isThisColorCanMove(figure: FENKey) {
+        return (
+            this._utilityService.isWhiteFigure(figure) ===
+            this._gameSessionService.IsWhiteTurn
+        );
     }
 
     private _doMove(fromIndex: number, toIndex: number) {

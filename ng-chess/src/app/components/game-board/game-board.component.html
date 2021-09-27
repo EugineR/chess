@@ -2,9 +2,9 @@
     <div class="board"  [ngClass]="getBoardClass" cdkDropListGroup>
         <div
             *ngFor="let figure of squares; let i = index"
+            cdkDropList
             [id]="i.toString()"
             [ngClass]="getSquareClass(i)"
-            cdkDropList
             [cdkDropListData]="[figure]"
             (cdkDropListDropped)="drop($event)"
             (click)="selectFigure($event, figure, i)"
@@ -19,6 +19,7 @@
                 cdkDragBoundary=".board"
                 cdkDrag
                 class="figure"
+                [cdkDragDisabled]="getDraggableDisableState(i)"
                 [innerHTML]="getInnerHtml(figure)"
             ></div>
         </div>
